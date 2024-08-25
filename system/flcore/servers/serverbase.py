@@ -6,7 +6,6 @@ import copy
 import time
 import random
 from utils.data_utils import read_client_data
-from utils.dlg import DLG
 
 
 class Server(object):
@@ -53,14 +52,7 @@ class Server(object):
         self.train_slow_rate = args.train_slow_rate
         self.send_slow_rate = args.send_slow_rate
 
-        self.dlg_eval = args.dlg_eval
-        self.dlg_gap = args.dlg_gap
         self.batch_num_per_client = args.batch_num_per_client
-
-        self.num_new_clients = args.num_new_clients
-        self.new_clients = []
-        self.eval_new_clients = False
-        self.fine_tuning_epoch_new = args.fine_tuning_epoch_new
 
     def set_clients(self, clientObj):
         for i, train_slow, send_slow in zip(range(self.num_clients), self.train_slow_clients, self.send_slow_clients):
@@ -281,90 +273,3 @@ class Server(object):
             else:
                 raise NotImplementedError
         return True
-
-    def call_dlg(self, R):
-        # items = []
-        cnt = 0
-        psnr_val = 0
-        for cid, client_model in zip(self.uploaded_ids, self.uploaded_models):
-            client_model.eval()
-            origin_grad = []
-            for gp, pp in zip(self.global_model.parameters(), client_model.parameters()):
-                origin_grad.append(gp.data - pp.data)
-
-            target_inputs = []
-            trainloader = self.clients[cid].load_train_data()
-            with torch.no_grad():
-                for i, (x, y) in enumerate(trainloader):
-                    if i >= self.batch_num_per_client:
-                        break
-
-                    if type(x) == type([]):
-                        x[0] = x[0].to(self.device)
-                    else:
-                        x = x.to(self.device)
-                    y = y.to(self.device)
-                    output = client_model(x)
-                    target_inputs.append((x, output))
-
-            d = DLG(client_model, origin_grad, target_inputs)
-            if d is not None:
-                psnr_val += d
-                cnt += 1
-            
-            # items.append((client_model, origin_grad, target_inputs))
-                
-        if cnt > 0:
-            print('PSNR value is {:.2f} dB'.format(psnr_val / cnt))
-        else:
-            print('PSNR error')
-
-        # self.save_item(items, f'DLG_{R}')
-
-    def set_new_clients(self, clientObj):
-        for i in range(self.num_clients, self.num_clients + self.num_new_clients):
-            train_data = read_client_data(self.dataset, i, is_train=True)
-            test_data = read_client_data(self.dataset, i, is_train=False)
-            client = clientObj(self.args, 
-                            id=i, 
-                            train_samples=len(train_data), 
-                            test_samples=len(test_data), 
-                            train_slow=False, 
-                            send_slow=False)
-            self.new_clients.append(client)
-
-    # fine-tuning on new clients
-    def fine_tuning_new_clients(self):
-        for client in self.new_clients:
-            client.set_parameters(self.global_model)
-            opt = torch.optim.SGD(client.model.parameters(), lr=self.learning_rate)
-            CEloss = torch.nn.CrossEntropyLoss()
-            trainloader = client.load_train_data()
-            client.model.train()
-            for e in range(self.fine_tuning_epoch_new):
-                for i, (x, y) in enumerate(trainloader):
-                    if type(x) == type([]):
-                        x[0] = x[0].to(client.device)
-                    else:
-                        x = x.to(client.device)
-                    y = y.to(client.device)
-                    output = client.model(x)
-                    loss = CEloss(output, y)
-                    opt.zero_grad()
-                    loss.backward()
-                    opt.step()
-
-    # evaluating on new clients
-    def test_metrics_new_clients(self):
-        num_samples = []
-        tot_correct = []
-        tot_auc = []
-        for c in self.new_clients:
-            ct, ns, auc = c.test_metrics()
-            tot_correct.append(ct*1.0)
-            tot_auc.append(auc*ns)
-            num_samples.append(ns)
-
-        ids = [c.id for c in self.new_clients]
-
-        return ids, num_samples, tot_correct, tot_auc

@@ -27,12 +27,6 @@ def generate_mnist(dir_path, num_clients, num_classes, niid, balance, partition)
     if check(config_path, train_path, test_path, num_clients, num_classes, niid, balance, partition):
         return
 
-    # FIX HTTP Error 403: Forbidden
-    # from six.moves import urllib
-    # opener = urllib.request.build_opener()
-    # opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    # urllib.request.install_opener(opener)
-
     # Get MNIST data
     transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize([0.5], [0.5])])
 
