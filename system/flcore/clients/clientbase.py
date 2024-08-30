@@ -41,9 +41,6 @@ class Client(object):
         self.train_time_cost = {'num_rounds': 0, 'total_cost': 0.0}
         self.send_time_cost = {'num_rounds': 0, 'total_cost': 0.0}
 
-        self.privacy = args.privacy
-        self.dp_sigma = args.dp_sigma
-
         self.loss = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate)
         # 指数学习率衰减控制器

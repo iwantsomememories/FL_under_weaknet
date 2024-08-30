@@ -39,8 +39,6 @@ class FedAvg(Server):
             # [t.join() for t in threads]
 
             self.receive_models()
-            if self.dlg_eval and i%self.dlg_gap == 0:
-                self.call_dlg(i)
             self.aggregate_parameters()
 
             self.Budget.append(time.time() - s_t)
@@ -58,10 +56,3 @@ class FedAvg(Server):
 
         self.save_results()
         self.save_global_model()
-
-        if self.num_new_clients > 0:
-            self.eval_new_clients = True
-            self.set_new_clients(clientAVG)
-            print(f"\n-------------Fine tuning round-------------")
-            print("\nEvaluate new clients")
-            self.evaluate()

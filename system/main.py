@@ -27,40 +27,40 @@ import torchvision
 import logging
 
 from flcore.servers.serveravg import FedAvg
-from flcore.servers.serverpFedMe import pFedMe
-from flcore.servers.serverperavg import PerAvg
-from flcore.servers.serverprox import FedProx
-from flcore.servers.serverfomo import FedFomo
-from flcore.servers.serveramp import FedAMP
-from flcore.servers.servermtl import FedMTL
-from flcore.servers.serverlocal import Local
-from flcore.servers.serverper import FedPer
-from flcore.servers.serverapfl import APFL
-from flcore.servers.serverditto import Ditto
-from flcore.servers.serverrep import FedRep
-from flcore.servers.serverphp import FedPHP
-from flcore.servers.serverbn import FedBN
-from flcore.servers.serverrod import FedROD
-from flcore.servers.serverproto import FedProto
-from flcore.servers.serverdyn import FedDyn
-from flcore.servers.servermoon import MOON
-from flcore.servers.serverbabu import FedBABU
-from flcore.servers.serverapple import APPLE
-from flcore.servers.servergen import FedGen
-from flcore.servers.serverscaffold import SCAFFOLD
-from flcore.servers.serverdistill import FedDistill
-from flcore.servers.serverala import FedALA
-from flcore.servers.serverpac import FedPAC
-from flcore.servers.serverlg import LG_FedAvg
-from flcore.servers.servergc import FedGC
-from flcore.servers.serverfml import FML
-from flcore.servers.serverkd import FedKD
-from flcore.servers.serverpcl import FedPCL
-from flcore.servers.servercp import FedCP
-from flcore.servers.servergpfl import GPFL
-from flcore.servers.serverntd import FedNTD
-from flcore.servers.servergh import FedGH
-from flcore.servers.serveravgDBE import FedAvgDBE
+# from flcore.servers.serverpFedMe import pFedMe
+# from flcore.servers.serverperavg import PerAvg
+# from flcore.servers.serverprox import FedProx
+# from flcore.servers.serverfomo import FedFomo
+# from flcore.servers.serveramp import FedAMP
+# from flcore.servers.servermtl import FedMTL
+# from flcore.servers.serverlocal import Local
+# from flcore.servers.serverper import FedPer
+# from flcore.servers.serverapfl import APFL
+# from flcore.servers.serverditto import Ditto
+# from flcore.servers.serverrep import FedRep
+# from flcore.servers.serverphp import FedPHP
+# from flcore.servers.serverbn import FedBN
+# from flcore.servers.serverrod import FedROD
+# from flcore.servers.serverproto import FedProto
+# from flcore.servers.serverdyn import FedDyn
+# from flcore.servers.servermoon import MOON
+# from flcore.servers.serverbabu import FedBABU
+# from flcore.servers.serverapple import APPLE
+# from flcore.servers.servergen import FedGen
+# from flcore.servers.serverscaffold import SCAFFOLD
+# from flcore.servers.serverdistill import FedDistill
+# from flcore.servers.serverala import FedALA
+# from flcore.servers.serverpac import FedPAC
+# from flcore.servers.serverlg import LG_FedAvg
+# from flcore.servers.servergc import FedGC
+# from flcore.servers.serverfml import FML
+# from flcore.servers.serverkd import FedKD
+# from flcore.servers.serverpcl import FedPCL
+# from flcore.servers.servercp import FedCP
+# from flcore.servers.servergpfl import GPFL
+# from flcore.servers.serverntd import FedNTD
+# from flcore.servers.servergh import FedGH
+# from flcore.servers.serveravgDBE import FedAvgDBE
 
 from flcore.trainmodel.models import *
 
@@ -404,16 +404,10 @@ if __name__ == "__main__":
                         help="Running times")
     parser.add_argument('-eg', "--eval_gap", type=int, default=1,
                         help="Rounds gap for evaluation")
-    parser.add_argument('-dp', "--privacy", type=bool, default=False,
-                        help="differential privacy")
-    parser.add_argument('-dps', "--dp_sigma", type=float, default=0.0)
+
     parser.add_argument('-sfn', "--save_folder_name", type=str, default='items')
     parser.add_argument('-ab', "--auto_break", type=bool, default=False)
-    parser.add_argument('-dlg', "--dlg_eval", type=bool, default=False)
-    parser.add_argument('-dlgg', "--dlg_gap", type=int, default=100)
     parser.add_argument('-bnpc', "--batch_num_per_client", type=int, default=2)
-    parser.add_argument('-nnc', "--num_new_clients", type=int, default=0)
-    parser.add_argument('-ften', "--fine_tuning_epoch_new", type=int, default=0)
     # practical
     parser.add_argument('-cdr', "--client_drop_rate", type=float, default=0.0,
                         help="Rate for clients that train but drop out")
@@ -506,19 +500,11 @@ if __name__ == "__main__":
     print("Number of classes: {}".format(args.num_classes))
     print("Backbone: {}".format(args.model))
     print("Using device: {}".format(args.device))
-    print("Using DP: {}".format(args.privacy))
-    if args.privacy:
-        print("Sigma for DP: {}".format(args.dp_sigma))
     print("Auto break: {}".format(args.auto_break))
     if not args.auto_break:
         print("Global rounds: {}".format(args.global_rounds))
     if args.device == "cuda":
         print("Cuda device id: {}".format(os.environ["CUDA_VISIBLE_DEVICES"]))
-    print("DLG attack: {}".format(args.dlg_eval))
-    if args.dlg_eval:
-        print("DLG attack round gap: {}".format(args.dlg_gap))
-    print("Total number of new clients: {}".format(args.num_new_clients))
-    print("Fine tuning epoches on new clients: {}".format(args.fine_tuning_epoch_new))
     print("=" * 50)
 
 
